@@ -5,6 +5,10 @@
   ```bash
   nvm install 12.13.0 ou nvm install v12.13.0
   ```
+  Depois
+  ```bash
+  nvm use 12.13.0 ou nvm use v12.13.0
+  ```
 * NVM última versão disponível
     > Link para download e instalação no Windows -  <https://github.com/coreybutler/nvm-windows>
 
