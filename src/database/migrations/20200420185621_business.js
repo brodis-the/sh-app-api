@@ -5,7 +5,7 @@ exports.up = function(knex) {
     table.increments('id')
     table.string('businessTitle').notNullable()
     table.string('description', 500)
-    table.string('phone').notNullable()
+    table.string('phone', 13).notNullable()
     table.string('street')
     table.string('neighborhood')
     table.string('zipCode', 9)
@@ -13,10 +13,11 @@ exports.up = function(knex) {
     table.integer('userId').unsigned().notNullable()
     table.foreign('userId').references('id').inTable('users')
       .onDelete('CASCADE').onUpdate('CASCADE')
-    table.timestamps()
+    table.timestamps(true, true)
   })
 };
 
 exports.down = function(knex) {
-  
+  return knex.schema
+  .dropTable('business')
 };

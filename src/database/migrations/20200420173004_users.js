@@ -4,10 +4,10 @@ exports.up = function(knex) {
   .createTable( 'users', (table) => {
     table.increments('id')
     table.string('name').notNullable()
-    table.string('cpf').notNullable()
+    table.string('cpf', 14).notNullable()
     table.string('email').notNullable()
-    table.string('phone').notNullable()
-    table.timestamps()
+    table.string('phone', 13).notNullable()
+    table.timestamps(true, true)
   })
 };
 
