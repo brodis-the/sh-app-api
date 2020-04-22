@@ -6,7 +6,6 @@ exports.seed = function(knex) {
       // Inserts seed entries
       return knex('business').insert([
         {
-          id: 1, 
           businessTitle: 'Business Example', 
           description: 'this is a business example', 
           phone: '00 0000-0000', 
@@ -16,14 +15,14 @@ exports.seed = function(knex) {
           userId: 1
         },
         {
-          id: 2, 
           businessTitle: 'Business Example 2', 
           description: 'this is a business example', 
           phone: '00 0000-0000', 
           street: null, 
           neighborhood: null, 
           coordinates: null, 
-          userId: 2},
+          userId: 2
+        },
       ]);
     });
 };
