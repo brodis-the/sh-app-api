@@ -1,3 +1,4 @@
+// Crie uma copia deste arquivo sem a extensão .template
 module.exports = {
     development: {
       client: 'pg',
