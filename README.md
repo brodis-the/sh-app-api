@@ -16,7 +16,15 @@
 * PostgreSQL V.10.12
     > link para download e instalação Windows, Linux e MacOS - <https://www.enterprisedb.com/downloads/postgres-postgresql-downloads>
 
-
+## Executando Migrations e Seeding do Banco de Dados
+* Execute os comando abaixo para migrar todas as tabelas para o banco:
+    ```bash
+      npx knex migrate:latest
+    ```
+* Execute os comando abaixo para povoar todas as tabelas do banco:
+    ```bash
+      npx knex seed:run
+    ```
 
 ## Rodando o projeto
 * Instale todas as dependências rodando o comando:
