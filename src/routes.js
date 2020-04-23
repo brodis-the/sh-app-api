@@ -19,5 +19,9 @@ Route.patch('/users/:id', UserController.update )
 Route.delete('/users/:id', UserController.destroy )
 
 Route.get('/business', BusinessController.index )
+Route.get('/business/:id', BusinessController.show )
+Route.post('/business', BusinessController.store )
+Route.patch('/business/:id', BusinessController.update )
+Route.delete('/business/:id', BusinessController.destroy )
 
 module.exports = Route;
