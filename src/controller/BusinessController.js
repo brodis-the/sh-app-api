@@ -1,4 +1,5 @@
 const connection = require('../database/connection')
+const cepPromise = require('cep-promise')
 
 module.exports = {
   async index (req, res) {
@@ -31,11 +32,19 @@ module.exports = {
   },
 
   async store(req, res){
-    const {businessTitle, description, phone, street, neighborhood, coordinates,userId} = req.body
+    const {businessTitle, description, phone, street, neighborhood, zipCode, coordinates, userId} = req.body
     let error
 
+    if(zipCode){
+      try {
+        await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
+      } catch (error) {
+        return res.json({ error })
+      }
+    }
+
     const business = await connection('business')
-      .insert({ businessTitle, description, phone, street, neighborhood, coordinates,userId })
+      .insert({ businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId })
       .returning('*')
       .catch((err) =>{ 
         error = err
@@ -46,14 +55,22 @@ module.exports = {
 
   async update(req, res){
     const { id } = req.params
-    const {businessTitle, description, phone, street, neighborhood, coordinates,userId} = req.body
+    const {businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId} = req.body
     let error
+
+    if(zipCode){
+      try {
+        await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
+      } catch (error) {
+        return res.json({ error })
+      }
+    }
 
     const business = await connection('business')
       .where({ id })
       .update(
-        {businessTitle, description, phone, street, neighborhood, coordinates,userId},
-        ['businessTitle', 'description', 'phone', 'street', 'neighborhood', 'coordinates','userId', 'updated_at']
+        {businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId},
+        ['businessTitle', 'description', 'phone', 'street', 'neighborhood', 'zipCode', 'coordinates','userId', 'updated_at']
         )
       .catch((err) =>{ 
         error = err
