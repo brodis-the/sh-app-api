@@ -1,10 +1,11 @@
+// Crie uma copia deste arquivo sem a extensão .template
 module.exports = {
     development: {
       client: 'pg',
       connection: {
         host : '127.0.0.1',
-        user : 'root',
-        password : 'rootpasswd',
+        user : '',
+        password : '',
         database : 'sh-app',
         charset: 'utf8'
       },
