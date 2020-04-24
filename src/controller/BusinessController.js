@@ -69,9 +69,17 @@ module.exports = {
     const business = await connection('business')
       .where({ id })
       .update(
-        {businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId},
-        ['businessTitle', 'description', 'phone', 'street', 'neighborhood', 'zipCode', 'coordinates','userId', 'updated_at']
+        {businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId}
         )
+      .then(async () => {
+        const result = await connection('business')
+        .where({ id })
+        .update(
+          { updated_at: connection.fn.now(6) },
+          ['businessTitle', 'description', 'phone', 'street', 'neighborhood', 'zipCode', 'coordinates','userId', 'updated_at']
+        )
+        return result
+      })
       .catch((err) =>{ 
         error = err
       })
