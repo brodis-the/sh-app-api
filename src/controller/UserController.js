@@ -39,7 +39,16 @@ module.exports = {
     const {name, cpf, email, phone} = req.body
     const user = await connection('users')
       .where({ id })
-      .update({ name, cpf, email, phone }, [ 'name', 'cpf', 'email', 'phone' ])
+      .update({ name, cpf, email, phone })
+      .then(async () => {
+        const result = await connection('users')
+        .where({ id })
+        .update(
+          { updated_at: connection.fn.now(6) },
+          [ 'name', 'cpf', 'email', 'phone', 'updated_at']
+        )
+        return result
+      })
       .catch(function(error) { 
         return res.json({ error }) 
       })
