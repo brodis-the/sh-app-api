@@ -22,9 +22,9 @@ Route.patch('/users/:id', UserMiddleware.update, UserController.update )
 Route.delete('/users/:id', UserMiddleware.destroy, UserController.destroy )
 
 Route.get('/business', BusinessController.index )
-Route.get('/business/:id', BusinessController.show )
-Route.post('/business', BusinessController.store )
-Route.patch('/business/:id', BusinessController.update )
-Route.delete('/business/:id', BusinessController.destroy )
+Route.get('/business/:id', BusinessMiddleware.show, BusinessController.show )
+Route.post('/business', BusinessMiddleware.store, BusinessController.store )
+Route.patch('/business/:id', BusinessMiddleware.update, BusinessController.update )
+Route.delete('/business/:id', BusinessMiddleware.destroy, BusinessController.destroy )
 
 module.exports = Route;
