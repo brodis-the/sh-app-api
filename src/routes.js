@@ -3,6 +3,9 @@ const express = require('express')
 const UserController = require('./controller/UserController')
 const BusinessController = require('./controller/BusinessController')
 
+const UserMiddleware = require('./middlewares/UserMiddleware')
+const BusinessMiddleware = require('./middlewares/BusinessMiddleware')
+
 const Route = express.Router()
 
 Route.get('/', (request, response) => {
@@ -13,10 +16,10 @@ Route.get('/', (request, response) => {
 });
 
 Route.get('/users', UserController.index )
-Route.get('/users/:id', UserController.show )
-Route.post('/users', UserController.store )
-Route.patch('/users/:id', UserController.update )
-Route.delete('/users/:id', UserController.destroy )
+Route.get('/users/:id', UserMiddleware.show, UserController.show )
+Route.post('/users', UserMiddleware.store, UserController.store )
+Route.patch('/users/:id', UserMiddleware.update, UserController.update )
+Route.delete('/users/:id', UserMiddleware.destroy, UserController.destroy )
 
 Route.get('/business', BusinessController.index )
 Route.get('/business/:id', BusinessController.show )
