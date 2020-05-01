@@ -6,7 +6,7 @@ exports.up = function(knex) {
     table.string('name').notNullable()
     table.string('cpf', 14).notNullable()
     table.string('email').notNullable()
-    table.string('phone', 13).notNullable()
+    table.string('phone', 17).notNullable()
     table.timestamps(true, true)
   })
 };
