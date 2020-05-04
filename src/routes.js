@@ -2,6 +2,7 @@ const express = require('express')
 
 const UserController = require('./controller/UserController')
 const BusinessController = require('./controller/BusinessController')
+const AuthController = require('./controller/AuthController')
 
 const UserMiddleware = require('./middlewares/UserMiddleware')
 const BusinessMiddleware = require('./middlewares/BusinessMiddleware')
@@ -14,6 +15,8 @@ Route.get('/', (request, response) => {
       status: 'OK!'
   });
 });
+
+Route.post('/login', AuthController.login)
 
 Route.get('/users', UserController.index )
 Route.get('/users/:id', UserMiddleware.show, UserController.show )

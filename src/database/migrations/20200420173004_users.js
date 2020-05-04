@@ -10,6 +10,9 @@ exports.up = function(knex) {
     table.string('phone', 17)
     table.timestamps(true, true)
   })
+  .alterTable('users', (table)=>{
+    table.unique('email')
+  })
 };
 
 exports.down = function(knex) {
