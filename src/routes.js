@@ -6,6 +6,7 @@ const AuthController = require('./controller/AuthController')
 
 const UserMiddleware = require('./middlewares/UserMiddleware')
 const BusinessMiddleware = require('./middlewares/BusinessMiddleware')
+const AuthMiddleware = require('./middlewares/AuthMiddleware')
 
 const Route = express.Router()
 
@@ -16,8 +17,8 @@ Route.get('/', (request, response) => {
   });
 });
 
-Route.post('/login', AuthController.login)
-Route.post('/logout',AuthController.logout)
+Route.post('/login', AuthMiddleware.login, AuthController.login)
+Route.post('/logout', AuthMiddleware.authOnly, AuthController.logout)
 
 Route.get('/users', UserController.index )
 Route.get('/users/:id', UserMiddleware.show, UserController.show )

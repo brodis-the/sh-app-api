@@ -1,4 +1,6 @@
 const { validationResult } = require('express-validator')
+const jwt = require('jsonwebtoken')
+const connection = require('../database/connection')
 
 const showValidation = (req, res, next) => {
   if (!validationResult(req).isEmpty()){
@@ -7,4 +9,24 @@ const showValidation = (req, res, next) => {
   next()
 }
 
-module.exports= { showValidation }
+const renewToken = async (tokenDecrypted = {}, token = '')=>{
+  // create a new token and get current timestamps
+  const newToken = jwt.sign({id: tokenDecrypted.payload.id }, process.env.SECRET_KEY, { expiresIn: '8h' })
+  const nowTimestamps = jwt.verify(newToken, process.env.SECRET_KEY).iat
+
+  // verify life of the token
+  const restOfLife = tokenDecrypted.payload.exp - nowTimestamps 
+  if (restOfLife <= 3600){
+    await connection('_tokens')
+      .insert({ 
+        token: token, 
+        type: 'authentication token', 
+        isRevoked: true, 
+        userId: tokenDecrypted.payload.id
+      })
+    return newToken
+  }
+  return token
+}
+
+module.exports= { showValidation, renewToken }

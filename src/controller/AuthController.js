@@ -32,16 +32,13 @@ module.exports = {
   },
 
   async logout(req, res){
-    const [ schema, token ] = req.headers.authorization.split(' ')
-    const decrypted = await jwt.verify(token, process.env.SECRET_KEY, { complete: true })
-
     try {
       await connection('_tokens')
         .insert({ 
-          token: token, 
+          token: req.token, 
           type: 'authentication token', 
           isRevoked: true, 
-          userId: decrypted.payload.id
+          userId: req.userId
         })
       return res.status(204).send()
     } catch (error) {
