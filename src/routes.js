@@ -17,6 +17,7 @@ Route.get('/', (request, response) => {
 });
 
 Route.post('/login', AuthController.login)
+Route.post('/logout',AuthController.logout)
 
 Route.get('/users', UserController.index )
 Route.get('/users/:id', UserMiddleware.show, UserController.show )
