@@ -8,7 +8,7 @@ module.exports = {
 
     try {
       const [user] = await connection('users')
-        .select('id', 'email', 'password')
+        .select('id', 'name', 'email', 'password')
         .where({ email })
         .limit(1)
       
