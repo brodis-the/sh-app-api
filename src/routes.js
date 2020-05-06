@@ -19,6 +19,8 @@ Route.get('/', (request, response) => {
 
 Route.post('/login', AuthMiddleware.login, AuthController.login)
 Route.post('/logout', AuthMiddleware.authOnly, AuthController.logout)
+Route.post('/password/forgot', AuthController.forgotPassword)
+Route.post('/password/reset', AuthController.resetPassword)
 
 Route.get('/users', UserController.index )
 Route.get('/users/:id', UserMiddleware.show, UserController.show )
