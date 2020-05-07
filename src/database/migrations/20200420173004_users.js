@@ -8,6 +8,7 @@ exports.up = function(knex) {
     table.string('email').notNullable()
     table.string('password').notNullable()
     table.string('phone', 17)
+    table.timestamp('emailVerifiedAt', { precision: 6 })
     table.timestamps(true, true)
   })
   .alterTable('users', (table)=>{

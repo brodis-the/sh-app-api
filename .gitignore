@@ -5,3 +5,5 @@ yarn.lock
 knexfile.js
 
 .env
+
+src/resources/teste.html
