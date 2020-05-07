@@ -2,6 +2,11 @@ const express = require('express')
 
 const UserController = require('./controller/UserController')
 const BusinessController = require('./controller/BusinessController')
+const AuthController = require('./controller/AuthController')
+
+const UserMiddleware = require('./middlewares/UserMiddleware')
+const BusinessMiddleware = require('./middlewares/BusinessMiddleware')
+const AuthMiddleware = require('./middlewares/AuthMiddleware')
 
 const Route = express.Router()
 
@@ -12,16 +17,21 @@ Route.get('/', (request, response) => {
   });
 });
 
+Route.post('/login', AuthMiddleware.login, AuthController.login)
+Route.post('/logout', AuthMiddleware.authOnly, AuthController.logout)
+Route.post('/password/forgot', AuthController.forgotPassword)
+Route.post('/password/reset', AuthController.resetPassword)
+
 Route.get('/users', UserController.index )
-Route.get('/users/:id', UserController.show )
-Route.post('/users', UserController.store )
-Route.patch('/users/:id', UserController.update )
-Route.delete('/users/:id', UserController.destroy )
+Route.get('/users/:id', UserMiddleware.show, UserController.show )
+Route.post('/users', UserMiddleware.store, UserController.store )
+Route.patch('/users/:id', UserMiddleware.update, UserController.update )
+Route.delete('/users/:id', UserMiddleware.destroy, UserController.destroy )
 
 Route.get('/business', BusinessController.index )
-Route.get('/business/:id', BusinessController.show )
-Route.post('/business', BusinessController.store )
-Route.patch('/business/:id', BusinessController.update )
-Route.delete('/business/:id', BusinessController.destroy )
+Route.get('/business/:id', BusinessMiddleware.show, BusinessController.show )
+Route.post('/business', BusinessMiddleware.store, BusinessController.store )
+Route.patch('/business/:id', BusinessMiddleware.update, BusinessController.update )
+Route.delete('/business/:id', BusinessMiddleware.destroy, BusinessController.destroy )
 
 module.exports = Route;

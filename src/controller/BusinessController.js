@@ -37,7 +37,11 @@ module.exports = {
 
     if(zipCode){
       try {
-        await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
+        if(typeof(zipCode) == 'string'){
+          await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
+        }else{
+          await cepPromise(zipCode)
+        }
       } catch (error) {
         return res.json({ error })
       }
@@ -55,12 +59,16 @@ module.exports = {
 
   async update(req, res){
     const { id } = req.params
-    const {businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId} = req.body
+    const {businessTitle, description, phone, street, neighborhood, zipCode, coordinates} = req.body
     let error
 
     if(zipCode){
       try {
-        await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
+        if(typeof(zipCode) == 'string'){
+          await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
+        }else{
+          await cepPromise(zipCode)
+        }
       } catch (error) {
         return res.json({ error })
       }
@@ -69,14 +77,14 @@ module.exports = {
     const business = await connection('business')
       .where({ id })
       .update(
-        {businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId}
+        {businessTitle, description, phone, street, neighborhood, zipCode, coordinates}
         )
       .then(async () => {
         const result = await connection('business')
         .where({ id })
         .update(
           { updated_at: connection.fn.now(6) },
-          ['businessTitle', 'description', 'phone', 'street', 'neighborhood', 'zipCode', 'coordinates','userId', 'updated_at']
+          ['businessTitle', 'description', 'phone', 'street', 'neighborhood', 'zipCode', 'coordinates', 'updated_at']
         )
         return result
       })

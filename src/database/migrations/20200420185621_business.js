@@ -5,7 +5,7 @@ exports.up = function(knex) {
     table.increments('id')
     table.string('businessTitle').notNullable()
     table.string('description', 500)
-    table.string('phone', 13).notNullable()
+    table.string('phone', 17).notNullable()
     table.string('street')
     table.string('neighborhood')
     table.string('zipCode', 9)
