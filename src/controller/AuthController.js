@@ -105,13 +105,7 @@ module.exports = {
       const [updatedUser] = await connection('users')
         .where({ id: decodedToken.id })
         .update({ password: encryptedPassword}, ['id', 'name', 'email'])
-        .catch((error)=>error)
       
-      // examines possible errors
-      if((updatedUser.name && updatedUser.name === 'error') && 
-        (updatedUser.length && updatedUser.length > 0))
-        return res.status(400).json({ error: updatedUser })
-
       // authenticates the user
       const loginToken = jwt.sign({id: updatedUser.id }, process.env.SECRET_KEY, { expiresIn: '8h' })
       updatedUser.token = loginToken
@@ -121,7 +115,102 @@ module.exports = {
 
       return res.json( updatedUser )
     } catch (error) {
-      return res.status(400).json({ error , ok:true})
+      return res.status(400).json({ error })
+    }
+  },
+
+  async abortResetPassword(req, res){
+    const token = req.query.hash
+    try{
+      // checks if the token is valid, exists in the database and belongs to this user
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY)
+      const [checkToken] = await connection('_tokens')
+        .select('id')
+        .where({ token, type: 'password reset token', isRevoked: false, userId: decodedToken.id })
+        .limit(1)
+      if(!checkToken)
+        return res.status(400).json({ error: { value: token, param: 'token', msg: 'token not found' }})
+
+      // delete reported token 
+      await connection('_tokens').del().where({ id: checkToken.id })
+
+      return res.status(204).send()
+    }catch(error){
+      res.status(400).json({ error })
+    }
+  },
+
+  async verifyEmail(req, res){
+    const token = req.query.hash
+    try {
+      // checks if the token is valid, owner was been verified, token exists in the database and belongs to this user
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY)
+      
+      const [user] = await connection('users')
+        .leftJoin('_tokens', 'users.id', '_tokens.userId')
+        .select('users.emailVerifiedAt', {tokenId: '_tokens.id'} )
+        .where('users.id', decodedToken.id)
+
+      if (user.emailVerifiedAt)
+        return res.status(400).json({ error: { value: token, param: 'token', msg: 'user email was been verified'} })
+      
+      if(!user.tokenId)
+        return res.status(400).json({ error: { value: token, param: 'token', msg: 'token not found' }})
+      
+      // add emailVerifyiedAt in database
+      const [updatedUser] = await connection('users')
+        .select('id', 'created_at')
+        .where({ id: decodedToken.id})
+        .then(async ([user])=>{
+          const updateUser = await connection('users')
+          .update(
+            { emailVerifiedAt: connection.fn.now(6), updated_at: connection.fn.now(6) },
+            [ 'id', 'name', 'email', 'updated_at']
+          )
+          .where({ id: user.id})
+          
+          return updateUser
+        })
+
+      await connection('_tokens')
+        .del()
+        .where({ token, type: 'email verification token', isRevoked: false, userId: decodedToken.id })
+
+      // authenticates the user
+      const loginToken = jwt.sign({id: updatedUser.id }, process.env.SECRET_KEY, { expiresIn: '8h' })
+      updatedUser.token = loginToken
+      
+      return res.json({ user: updatedUser})
+    } catch (error) {
+      return res.status(400).json({ error })
+    }
+  },
+
+  async abortVerifyEmail(req,res){
+    const token = req.query.hash
+    try {
+      // checks if the token is valid, owner was been verified, token exists in the database and belongs to this user
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY)
+      
+      const [user] = await connection('users')
+        .leftJoin('_tokens', 'users.id', '_tokens.userId')
+        .select('users.emailVerifiedAt', {tokenId: '_tokens.id'} )
+        .where('users.id', decodedToken.id)
+
+      if (user && user.emailVerifiedAt)
+        return res.status(400).json({ error: { value: token, param: 'token', msg: 'user email was been verified'} })
+      
+      if(!user || !user.tokenId)
+        return res.status(400).json({ error: { value: token, param: 'token', msg: 'token not found' }})
+
+      // delete user registered with wrong email
+      await connection('users')
+        .del()
+        .where({ id: decodedToken.id})
+
+      return res.status(204).send()
+    } catch (error) {
+      return res.status(400).json({ error })
     }
   }
 }

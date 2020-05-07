@@ -7,7 +7,7 @@ const verifyEmail = require('../resources/emails/verifyEmail')
 module.exports = {
   async index (req, res) {
     users = await connection('users')
-      .select('id', 'name', 'cpf', 'email', 'phone', 'created_at', 'updated_at')
+      .select('id', 'name', 'cpf', 'email', 'phone', 'emailVerifiedAt', 'created_at', 'updated_at')
       .orderBy('created_at')
 
     return res.json( users )
@@ -17,7 +17,7 @@ module.exports = {
     const { id } = req.params
 
     let user = await connection('users')
-      .select('id', 'name', 'cpf', 'email', 'phone', 'created_at', 'updated_at')
+      .select('id', 'name', 'cpf', 'email', 'phone', 'emailVerifiedAt', 'created_at', 'updated_at')
       .where({ id })
 
     if( user[0] ){
