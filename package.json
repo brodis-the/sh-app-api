@@ -17,6 +17,7 @@
     "express-validator": "6.4.0",
     "jsonwebtoken": "8.5.1",
     "knex": "0.20.15",
+    "nodemailer": "^6.4.6",
     "pg": "8.0.2",
     "sqlite3": "4.1.1"
   },
