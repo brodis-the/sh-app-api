@@ -1,5 +1,8 @@
-const connection = require('../database/connection')
 const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
+const connection = require('../database/connection')
+const { transport } = require('../config/mail')
+const verifyEmail = require('../resources/emails/verifyEmail')
 
 module.exports = {
   async index (req, res) {
@@ -29,15 +32,41 @@ module.exports = {
 
   async store(req, res){
     const {name, cpf, email, password, phone} = req.body
-    const encryptedPassword = crypto.createHash('sha256').update(password).digest('base64')
-    const user = await connection('users')
-      .insert({ name, cpf, email, password: encryptedPassword, phone },
-        [ 'id', 'name', 'cpf', 'email', 'phone', 'created_at', 'updated_at'])
-      .catch(function(error) { 
-        return res.status(400).json({ error, message: 'error when registering the user'}) 
+
+    try {
+      const encryptedPassword = crypto.createHash('sha256').update(password).digest('base64')
+      const user = await connection('users')
+        .insert({ name, cpf, email, password: encryptedPassword, phone },
+          [ 'id', 'name', 'cpf', 'email', 'phone', 'created_at', 'updated_at'])
+        .then(async([user])=>{
+          // generates a new token and inserts it into the bank
+          const token = jwt.sign({id: user.id, email: user.email}, process.env.SECRET_KEY, { algorithm: 'HS512' })
+          this.token = token
+          const [insertToken] = await connection('_tokens')
+            .insert(
+              { token: token, type: 'email verification token', userId: user.id},
+              ['id', 'created_at']
+            )
+          user.token = insertToken
+          return user
+        })
+
+      // sending verification of email
+      const receiver = { name: user.name, address: user.email}
+      transport.sendMail(verifyEmail(receiver, token), function(error, info){
+        if (error) {
+          return res.status(400).json({ error })
+        }
+        user.mailVerification = {
+          destination: info.accepted[0],
+          messageId: info.messageId,
+          response: info.response,
+        }
+        return res.json({ user })
       })
-    
-    return res.json( user )
+    } catch (error) {
+      return res.status(400).json({error})
+    }
   },
 
   async update(req, res){
