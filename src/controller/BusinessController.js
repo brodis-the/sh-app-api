@@ -33,28 +33,28 @@ module.exports = {
 
   async store(req, res){
     const {businessTitle, description, phone, street, neighborhood, zipCode, coordinates, userId} = req.body
-    let error
 
-    if(zipCode){
-      try {
-        if(typeof(zipCode) == 'string'){
-          await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
-        }else{
-          await cepPromise(zipCode)
-        }
-      } catch (error) {
-        return res.json({ error })
+    try {
+      const [user] = await connection('users').select('id').where({ id: userId})
+      if(!user) 
+        return res.status(400).json({ error: { value: userId, param: 'userId', msg: 'user not exists' }})
+
+      if(zipCode && (typeof(zipCode) == 'string')){
+        await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
+      }else if (zipCode && (typeof(zipCode) == 'number') ){
+        await cepPromise(zipCode)
       }
+  
+      const business = await connection('business')
+        .insert({ businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId })
+        .returning('*')
+      
+      return res.json( business )
+    } catch (error) {
+      if (error.name === "CepPromiseError")
+        return res.status(400).json({ error: { value: zipCode, param: 'zipCode', msg: error.errors[0].message } })
+      return res.status(400).json({ error })
     }
-
-    const business = await connection('business')
-      .insert({ businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId })
-      .returning('*')
-      .catch((err) =>{ 
-        error = err
-      })
-    
-    return res.json( business || { error })
   },
 
   async update(req, res){

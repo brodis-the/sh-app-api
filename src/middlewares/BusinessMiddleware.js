@@ -31,11 +31,7 @@ const store = [
     .isWhitelisted('0123456789,.°-NW ').withMessage('coordinates fields contains characters not indentified').bail()
     .optional({ nullable: true }),
   check('userId').notEmpty().withMessage('userId field is required').bail()
-    .isInt().withMessage('userId field is not a Integer').bail()
-    .custom(async (value)=>{
-      const user = await connection('users').select('created_at').where({ id: value})
-      if(!user[0]) return Promise.reject('user not exists')
-    }),
+    .isInt().withMessage('userId field is not a Integer'),
 
   showValidation
 ]
