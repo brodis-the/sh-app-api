@@ -18,12 +18,12 @@ Route.get('/', (request, response) => {
 });
 
 Route.post('/login', AuthMiddleware.login, AuthController.login)
-Route.patch('/logout', AuthMiddleware.authOnly, AuthController.logout)
-Route.post('/password/forgot', AuthController.forgotPassword)
-Route.patch('/password/reset', AuthController.resetPassword)
-Route.patch('/password/reset/abort', AuthController.abortResetPassword)
-Route.patch('/email/verify', AuthController.verifyEmail)
-Route.patch('/email/verify/abort', AuthController.abortVerifyEmail)
+Route.patch('/logout', AuthMiddleware.logout, AuthController.logout)
+Route.post('/password/forgot', AuthMiddleware.forgot, AuthController.forgotPassword)
+Route.patch('/password/reset', AuthMiddleware.resetPassword, AuthController.resetPassword)
+Route.patch('/password/reset/abort', AuthMiddleware.checkToken, AuthController.abortResetPassword)
+Route.patch('/email/verify', AuthMiddleware.checkToken, AuthController.verifyEmail)
+Route.patch('/email/verify/abort', AuthMiddleware.checkToken, AuthController.abortVerifyEmail)
 
 Route.get('/users', UserController.index )
 Route.get('/users/:id', UserMiddleware.show, UserController.show )
