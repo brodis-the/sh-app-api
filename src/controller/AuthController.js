@@ -10,13 +10,15 @@ module.exports = {
 
     try {
       const [user] = await connection('users')
-        .select('id', 'name', 'email', 'password')
+        .select('id', 'name', 'email', 'password', 'emailVerifiedAt')
         .where({ email })
         .limit(1)
       
-      if(!user){
-        return res.status(400).json({ error: { msg: 'email not found', param: 'email', value: email } })
-      }
+      if(!user)
+        return res.status(400).json({ error: { value: email, param: 'email', msg: 'email not found' } })
+            
+      if (!user.emailVerifiedAt)
+        return res.status(400).json({ error: { value: email, param: 'email', msg: 'user email has not yet been verified'} })
 
       const encryptedPassword = crypto.createHash('sha256').update(password).digest('base64')
       if(!(encryptedPassword === user.password)){
