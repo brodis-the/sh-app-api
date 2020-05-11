@@ -87,10 +87,17 @@ module.exports = {
   },
 
   async update(req, res){
-    const paramNickname = req.params.nickname
     let {name, nickname, cpf, email, phone} = req.body
+    const paramNickname = req.params.nickname
+    const userId = req.userId
 
     try {
+      //verify authorizathion of the user logged
+      const [authorized] = await connection('users').select('id').where({ id: userId })
+
+      if(!authorized)
+        return res.status(401).json({ value: nickname, param: 'nickname', msg: ' user is not authorized for this action'})
+
       // verify if this nick exist in the database
       if (nickname){
         const [verifyNickname] = await connection('users').select('id').where({ nickname }).limit(1)
@@ -127,8 +134,15 @@ module.exports = {
   
   async destroy(req, res){
     const { id } = req.params 
+    const userId = req.userId
 
     try {
+      //verify authorizathion of the user logged
+      const [authorized] = await connection('users').select('id').where({ id: userId })
+
+      if(!authorized)
+        return res.status(401).json({ value: nickname, param: 'nickname', msg: ' user is not authorized for this action'})
+      
       await connection('users')
         .where({ id })
         .del()
