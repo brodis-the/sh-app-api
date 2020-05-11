@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator')
 const jwt = require('jsonwebtoken')
+const {v4: uuidv4} = require('uuid')
 const connection = require('../database/connection')
 
 const showValidation = (req, res, next) => {
@@ -19,6 +20,7 @@ const renewToken = async (tokenDecrypted = {}, token = '')=>{
   if (restOfLife <= 3600){
     await connection('_tokens')
       .insert({ 
+        id: uuidv4(),
         token: token, 
         type: 'authentication token', 
         isRevoked: true, 

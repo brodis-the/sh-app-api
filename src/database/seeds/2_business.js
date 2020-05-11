@@ -1,3 +1,4 @@
+const {v4: uuidv4} = require('uuid')
 
 exports.seed = function(knex) {
   // Deletes ALL existing entries
@@ -6,6 +7,7 @@ exports.seed = function(knex) {
       // Inserts seed entries
       return knex('business').insert([
         {
+          id: uuidv4(),
           businessTitle: 'Business Example', 
           description: 'this is a business example', 
           phone: '00 0000-0000', 
@@ -15,6 +17,7 @@ exports.seed = function(knex) {
           userId: 1
         },
         {
+          id: uuidv4(),
           businessTitle: 'Business Example 2', 
           description: 'this is a business example', 
           phone: '00 0000-0000', 

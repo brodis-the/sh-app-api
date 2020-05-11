@@ -3,7 +3,7 @@ const { showValidation } = require('../utils/middlewares')
 const connection = require('../database/connection')
 
 const show = [
-  param('id').isInt().withMessage('id param is not a Integer'),
+  param('id').isUUID('4').withMessage('id param is not a valid ID'),
 
   showValidation
 ]
@@ -31,7 +31,7 @@ const store = [
     .isWhitelisted('0123456789,.°-NW ').withMessage('coordinates fields contains characters not indentified').bail()
     .optional({ nullable: true }),
   check('userId').notEmpty().withMessage('userId field is required').bail()
-    .isInt().withMessage('userId field is not a Integer').bail()
+    .isUUID('4').withMessage('userId field is not a valid ID').bail()
     .custom(async (value)=>{
       const user = await connection('users').select('created_at').where({ id: value})
       if(!user[0]) return Promise.reject('user not exists')
@@ -69,7 +69,7 @@ const update = [
 ]
 
 const destroy = [
-  param('id').isInt().withMessage('id param is not a Integer'),
+  param('id').isUUID('4').withMessage('id param is not a valid ID'),
 
   showValidation
 ]
