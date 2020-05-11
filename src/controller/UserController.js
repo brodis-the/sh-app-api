@@ -65,6 +65,8 @@ module.exports = {
         return res.json({ user })
       })
     } catch (error) {
+      if(error.name === 'error' && error.constraint)
+        return res.status(400).json({ error: { value: email, param: 'email', msg: 'email has already been registered' } })
       return res.status(400).json({error})
     }
   },
