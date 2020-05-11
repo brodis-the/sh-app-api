@@ -10,7 +10,8 @@ exports.up = function(knex) {
       table.string('password').notNullable()
       table.string('phone', 17)
       table.timestamp('emailVerifiedAt', { precision: 6 })
-      table.timestamps(true, true)
+      table.timestamp('createdAt', { precision: 6 }).defaultTo(knex.fn.now(6))
+      table.timestamp('updatedAt', { precision: 6 }).defaultTo(knex.fn.now(6))
     })
     .alterTable('users', (table)=>{
       table.unique('email')

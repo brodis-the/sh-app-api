@@ -4,7 +4,7 @@ const cepPromise = require('cep-promise')
 
 module.exports = {
   async index (req, res) {
-    business = await connection('business').select('*').orderBy('created_at')
+    business = await connection('business').select('*').orderBy('createdAt')
 
     return res.json( business )
   },
@@ -84,8 +84,8 @@ module.exports = {
         const result = await connection('business')
         .where({ id })
         .update(
-          { updated_at: connection.fn.now(6) },
-          ['businessTitle', 'description', 'phone', 'street', 'neighborhood', 'zipCode', 'coordinates', 'updated_at']
+          { updatedAt: connection.fn.now(6) },
+          ['businessTitle', 'description', 'phone', 'street', 'neighborhood', 'zipCode', 'coordinates', 'updatedAt']
         )
         return result
       })

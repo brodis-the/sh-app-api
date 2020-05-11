@@ -43,7 +43,7 @@ async function customAuthValidation (value, req, renew = false){
   try {
     const decrypted = await jwt.verify(token, process.env.SECRET_KEY, { complete: true })
     const [bannedToken] = await connection('_tokens')
-      .select('id', 'created_at', 'isRevoked')
+      .select('id', 'createdAt', 'isRevoked')
       .where({ userId: decrypted.payload.id, isRevoked: true, token })
       .limit(1)
     

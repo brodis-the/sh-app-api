@@ -8,8 +8,8 @@ const verifyEmail = require('../resources/emails/verifyEmail')
 module.exports = {
   async index (req, res) {
     users = await connection('users')
-      .select('id', 'name', 'nickname', 'cpf', 'email', 'phone', 'emailVerifiedAt', 'created_at', 'updated_at')
-      .orderBy('created_at')
+      .select('id', 'name', 'nickname', 'cpf', 'email', 'phone', 'emailVerifiedAt', 'createdAt', 'updatedAt')
+      .orderBy('createdAt')
 
     return res.json( users )
   },
@@ -19,7 +19,7 @@ module.exports = {
 
     try {
       let [user] = await connection('users')
-        .select('id', 'name', 'nickname', 'cpf', 'email', 'phone', 'emailVerifiedAt', 'created_at', 'updated_at')
+        .select('id', 'name', 'nickname', 'cpf', 'email', 'phone', 'emailVerifiedAt', 'createdAt', 'updatedAt')
         .where({ nickname })
 
       if( user ){
@@ -54,13 +54,13 @@ module.exports = {
       const encryptedPassword = crypto.createHash('sha256').update(password).digest('base64')
       const user = await connection('users')
         .insert({ id: uuidv4(), name, nickname, cpf, email, password: encryptedPassword, phone },
-          [ 'id', 'name', 'nickname', 'cpf', 'email', 'phone', 'created_at', 'updated_at'])
+          [ 'id', 'name', 'nickname', 'cpf', 'email', 'phone', 'createdAt', 'updatedAt'])
         .then(async([user])=>{
           // generates a new token and inserts it into the bank
           this.token = jwt.sign({id: user.id, email: user.email}, process.env.SECRET_KEY, { algorithm: 'HS512' })
           const [insertToken] = await connection('_tokens')
             .insert({ id: uuidv4(), token: this.token, type: 'email verification token', userId: user.id},
-              ['id', 'created_at'])
+              ['id', 'createdAt'])
           user.token = insertToken
           return user
         })
@@ -111,8 +111,8 @@ module.exports = {
           const result = await connection('users')
           .where({ nickname: paramNickname })
           .update(
-            { updated_at: connection.fn.now(6) },
-            [ 'name', 'nickname', 'cpf', 'email', 'phone', 'updated_at']
+            { updatedAt: connection.fn.now(6) },
+            [ 'name', 'nickname', 'cpf', 'email', 'phone', 'updatedAt']
           )
           return result
         })

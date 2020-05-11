@@ -13,7 +13,8 @@ exports.up = function(knex) {
       table.uuid('userId').unsigned().notNullable()
       table.foreign('userId').references('id').inTable('users')
         .onDelete('CASCADE').onUpdate('CASCADE')
-      table.timestamps(true, true)
+        table.timestamp('createdAt', { precision: 6 }).defaultTo(knex.fn.now(6))
+        table.timestamp('updatedAt', { precision: 6 }).defaultTo(knex.fn.now(6))
     })
 };
 

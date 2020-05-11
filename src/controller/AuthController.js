@@ -70,7 +70,7 @@ module.exports = {
       const [insertToken] = await connection('_tokens')
         .insert(
           { id: uuidv4(), token: token, type: 'password reset token', isRevoked: false, userId: user.id},
-          ['id', 'created_at']
+          ['id', 'createdAt']
         )
 
       // sends an email to the user
@@ -163,13 +163,13 @@ module.exports = {
       
       // add emailVerifyiedAt in database
       const [updatedUser] = await connection('users')
-        .select('id', 'created_at')
+        .select('id', 'createdAt')
         .where({ id: decodedToken.id})
         .then(async ([user])=>{
           const updateUser = await connection('users')
           .update(
-            { emailVerifiedAt: connection.fn.now(6), updated_at: connection.fn.now(6) },
-            [ 'id', 'name', 'email', 'updated_at']
+            { emailVerifiedAt: connection.fn.now(6), updatedAt: connection.fn.now(6) },
+            [ 'id', 'name', 'email', 'updatedAt']
           )
           .where({ id: user.id})
           

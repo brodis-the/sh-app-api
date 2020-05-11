@@ -33,7 +33,7 @@ const store = [
   check('userId').notEmpty().withMessage('userId field is required').bail()
     .isUUID('4').withMessage('userId field is not a valid ID').bail()
     .custom(async (value)=>{
-      const [user] = await connection('users').select('created_at').where({ id: value})
+      const [user] = await connection('users').select('createdAt').where({ id: value})
       if(!user) return Promise.reject('user not exists')
     }),
 
