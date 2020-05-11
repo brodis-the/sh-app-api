@@ -1,4 +1,5 @@
 const connection = require('../database/connection')
+const { v4: uuidv4 } = require('uuid')
 const cepPromise = require('cep-promise')
 
 module.exports = {
@@ -46,7 +47,7 @@ module.exports = {
       }
   
       const business = await connection('business')
-        .insert({ businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId })
+        .insert({ id: uuidv4(), businessTitle, description, phone, street, neighborhood, zipCode, coordinates,userId })
         .returning('*')
       
       return res.json( business )

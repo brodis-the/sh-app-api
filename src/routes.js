@@ -26,9 +26,9 @@ Route.patch('/email/verify', AuthMiddleware.checkToken, AuthController.verifyEma
 Route.patch('/email/verify/abort', AuthMiddleware.checkToken, AuthController.abortVerifyEmail)
 
 Route.get('/users', UserController.index )
-Route.get('/users/:id', UserMiddleware.show, UserController.show )
+Route.get('/users/:nickname', UserMiddleware.show, UserController.show )
 Route.post('/users', UserMiddleware.store, UserController.store )
-Route.patch('/users/:id', UserMiddleware.update, UserController.update )
+Route.patch('/users/:nickname', UserMiddleware.update, UserController.update )
 Route.delete('/users/:id', UserMiddleware.destroy, UserController.destroy )
 
 Route.get('/business', BusinessController.index )

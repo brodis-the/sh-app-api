@@ -1,5 +1,6 @@
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
+const { v4: uuidv4 } = require('uuid')
 const connection = require('../database/connection')
 const { transport } = require('../config/mail')
 const emailOfResetPassword = require('../resources/emails/resetPassword')
@@ -39,6 +40,7 @@ module.exports = {
     try {
       await connection('_tokens')
         .insert({ 
+          id: uuidv4(),
           token: req.token, 
           type: 'authentication token', 
           isRevoked: true, 
@@ -58,6 +60,7 @@ module.exports = {
       .select('id', 'name', 'email')
       .where({ email })
       .limit(1)
+
     if(!user)
       return res.status(400).json({ error: { value: email, param: 'email', msg: 'email not found' } })
     
@@ -66,10 +69,9 @@ module.exports = {
       const token = jwt.sign({id: user.id, email: user.email}, process.env.SECRET_KEY, { algorithm: 'HS512' })
       const [insertToken] = await connection('_tokens')
         .insert(
-          { token: token, type: 'password reset token', isRevoked: false, userId: user.id},
+          { id: uuidv4(), token: token, type: 'password reset token', isRevoked: false, userId: user.id},
           ['id', 'created_at']
         )
-        .catch((error)=>error)
 
       // sends an email to the user
       const receiver = { name: user.name, address: user.email}
