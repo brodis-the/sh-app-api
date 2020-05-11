@@ -7,6 +7,7 @@ const AuthController = require('./controller/AuthController')
 const UserMiddleware = require('./middlewares/UserMiddleware')
 const BusinessMiddleware = require('./middlewares/BusinessMiddleware')
 const AuthMiddleware = require('./middlewares/AuthMiddleware')
+const auth = AuthMiddleware.auth
 
 const Route = express.Router()
 
@@ -25,16 +26,16 @@ Route.patch('/password/reset/abort', AuthMiddleware.checkToken, AuthController.a
 Route.patch('/email/verify', AuthMiddleware.checkToken, AuthController.verifyEmail)
 Route.patch('/email/verify/abort', AuthMiddleware.checkToken, AuthController.abortVerifyEmail)
 
-Route.get('/users', UserController.index )
-Route.get('/users/:nickname', UserMiddleware.show, UserController.show )
+Route.get('/users', auth, UserController.index )
+Route.get('/users/:nickname', auth, UserMiddleware.show, UserController.show )
 Route.post('/users', UserMiddleware.store, UserController.store )
-Route.patch('/users/:nickname', UserMiddleware.update, UserController.update )
-Route.delete('/users/:id', UserMiddleware.destroy, UserController.destroy )
+Route.patch('/users/:nickname', auth, UserMiddleware.update, UserController.update )
+Route.delete('/users/:id', auth, UserMiddleware.destroy, UserController.destroy )
 
-Route.get('/business', BusinessController.index )
-Route.get('/business/:id', BusinessMiddleware.show, BusinessController.show )
-Route.post('/business', BusinessMiddleware.store, BusinessController.store )
-Route.patch('/business/:id', BusinessMiddleware.update, BusinessController.update )
-Route.delete('/business/:id', BusinessMiddleware.destroy, BusinessController.destroy )
+Route.get('/business', auth, BusinessController.index )
+Route.get('/business/:id', auth, BusinessMiddleware.show, BusinessController.show )
+Route.post('/business', auth, BusinessMiddleware.store, BusinessController.store )
+Route.patch('/business/:id', auth, BusinessMiddleware.update, BusinessController.update )
+Route.delete('/business/:id', auth, BusinessMiddleware.destroy, BusinessController.destroy )
 
 module.exports = Route;

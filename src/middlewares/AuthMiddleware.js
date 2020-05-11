@@ -1,21 +1,25 @@
-const jwt = require('jsonwebtoken')
-const { check, header, query } = require('express-validator')
+const { check, header, query, validationResult} = require('express-validator')
 const { showValidation, customAuthValidation } = require('../utils/middlewares')
 
 const auth = [
-  header('authorization').notEmpty().withMessage('this route needs token authentication')
-    .isString().withMessage('authorization field must be string')
+  header('authorization').notEmpty().withMessage('this route needs token authentication').bail()
+    .isString().withMessage('authorization field must be string').bail()
     .custom(async (value, {req})=>{
       return customAuthValidation(value, req, true)
     }),
   
-  showValidation
+  (req, res, next) => {
+    if (!validationResult(req).isEmpty()){
+      return res.status(401).json({ error: validationResult(req).array()[0] })
+    } 
+    next()
+  }
 ]
 
 const checkToken = [
   query('hash').notEmpty().withMessage('hash field is required').bail()
     .isString().withMessage('hash field is not a string')
-    .isLength({min: 196 , max: 196}).withMessage('hash length is invalid'),
+    .isLength({min: 196 }).withMessage('hash length is invalid'),
 
     showValidation
 ]
@@ -38,13 +42,18 @@ const login = [
 ]
 
 const logout = [
-  header('authorization').notEmpty().withMessage('this route needs token authentication')
-    .isString().withMessage('authorization field must be string')
+  header('authorization').notEmpty().withMessage('this route needs token authentication').bail()
+    .isString().withMessage('authorization field must be string').bail()
     .custom((value, {req})=>{
       return customAuthValidation(value, req)
     }),
   
-  showValidation
+  (req, res, next) => {
+    if (!validationResult(req).isEmpty()){
+      return res.status(401).json({ error: validationResult(req).array()[0] })
+    } 
+    next()
+  }
 ]
 
 const resetPassword = [

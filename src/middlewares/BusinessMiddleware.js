@@ -30,12 +30,6 @@ const store = [
     .isString().withMessage('coordinates field needs to be string').bail()
     .isWhitelisted('0123456789,.°-NW ').withMessage('coordinates fields contains characters not indentified').bail()
     .optional({ nullable: true }),
-  check('userId').notEmpty().withMessage('userId field is required').bail()
-    .isUUID('4').withMessage('userId field is not a valid ID').bail()
-    .custom(async (value)=>{
-      const [user] = await connection('users').select('createdAt').where({ id: value})
-      if(!user) return Promise.reject('user not exists')
-    }),
 
   showValidation
 ]

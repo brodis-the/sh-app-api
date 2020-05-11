@@ -33,7 +33,8 @@ module.exports = {
   },
 
   async store(req, res){
-    const {businessTitle, description, phone, street, neighborhood, zipCode, coordinates, userId} = req.body
+    const {businessTitle, description, phone, street, neighborhood, zipCode, coordinates} = req.body
+    const userId = req.userId
 
     try {
       const [user] = await connection('users').select('id').where({ id: userId})
@@ -59,10 +60,19 @@ module.exports = {
   },
 
   async update(req, res){
-    const { id } = req.params
     const {businessTitle, description, phone, street, neighborhood, zipCode, coordinates} = req.body
+    const { id } = req.params
+    const userId = req.userId
     let error
 
+    // verify if user is owner of the business
+    const [owner] = await connection('business')
+      .select('id', 'userId')
+      .where({ id, userId})
+    
+    if(!owner)
+      return res.status(401).json({ error: { value: id, param: 'business.id',msg: 'user is not authorized for this action'}})
+    
     if(zipCode){
       try {
         if(typeof(zipCode) == 'string'){
@@ -100,7 +110,16 @@ module.exports = {
 
   async destroy(req, res){
     const { id } = req.params 
+    const userId = req.userId
     let error
+
+    // verify if user is owner of the business
+    const [owner] = await connection('business')
+      .select('id', 'userId')
+      .where({ id, userId})
+    
+    if(!owner)
+      return res.status(401).json({ error: { value: id, param: 'business.id',msg: 'user is not authorized for this action'}})
 
     await connection('business')
       .where({ id })
