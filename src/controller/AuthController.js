@@ -82,7 +82,7 @@ module.exports = {
         }
         insertToken.mail = {destination: info.accepted[0], messageId: info.messageId, response: info.response}
 
-        return res.json({ forgot: insertToken })
+        return res.json( insertToken )
       })
     } catch (error) {
       return res.status(400).json({ error })
@@ -184,7 +184,7 @@ module.exports = {
       const loginToken = jwt.sign({id: updatedUser.id }, process.env.SECRET_KEY, { expiresIn: '8h' })
       updatedUser.token = loginToken
       
-      return res.json({ user: updatedUser})
+      return res.json( updatedUser )
     } catch (error) {
       return res.status(400).json({ error })
     }
