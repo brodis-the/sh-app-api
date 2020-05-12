@@ -11,25 +11,20 @@ module.exports = {
 
   async show(req, res){
     const { id } = req.params
-    let error
 
-    const business = await connection('business')
-      .join('users', 'users.id', '=', 'business.userId')
-      .select([
-        'business.*',
-        {
-          userName: 'users.name',
-          userEmail: 'users.email'
-        }
-      ])
-      .where( 'business.id', id)
-      .catch((err)=>{
-        error = err
-      })
-
-    if (!business[0]) res.json({ error: { code: 404, message: 'Business not found'}})
-
-    return res.json( business || {error} )
+    try {
+      const [business] = await connection('business')
+        .join('users', 'users.id', '=', 'business.userId')
+        .select(['business.*', { userName: 'users.name', userEmail: 'users.email'}])
+        .where( 'business.id', id)
+  
+      if (!business) 
+        return res.status(404).json({ error: { value: id, param: 'busines.id', msg: 'Business not found'}})
+  
+      return res.json( business )
+    } catch (error) {
+      return res.status(400).json({ error })
+    }
   },
 
   async store(req, res){
@@ -41,10 +36,12 @@ module.exports = {
       if(!user) 
         return res.status(400).json({ error: { value: userId, param: 'userId', msg: 'user not exists' }})
 
-      if(zipCode && (typeof(zipCode) == 'string')){
-        await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
-      }else if (zipCode && (typeof(zipCode) == 'number') ){
-        await cepPromise(zipCode)
+      if(zipCode){
+        if(typeof(zipCode) == 'string'){
+          await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
+        }else{
+          await cepPromise(zipCode)
+        }
       }
   
       const business = await connection('business')
@@ -63,73 +60,64 @@ module.exports = {
     const {businessTitle, description, phone, street, neighborhood, zipCode, coordinates} = req.body
     const { id } = req.params
     const userId = req.userId
-    let error
 
-    // verify if user is owner of the business
-    const [owner] = await connection('business')
-      .select('id', 'userId')
-      .where({ id, userId})
-    
-    if(!owner)
-      return res.status(401).json({ error: { value: id, param: 'business.id',msg: 'user is not authorized for this action'}})
-    
-    if(zipCode){
-      try {
+    try {
+      // verify if user is owner of the business
+      const [owner] = await connection('business')
+        .select('id', 'userId')
+        .where({ id, userId})
+      
+      if(!owner)
+        return res.status(401).json({ error: { value: id, param: 'business.id',msg: 'user is not authorized for this action'}})
+      
+      if(zipCode){
         if(typeof(zipCode) == 'string'){
           await cepPromise(zipCode.normalize('NFD').replace(/[^0-9]/g, ''))
         }else{
           await cepPromise(zipCode)
         }
-      } catch (error) {
-        return res.json({ error })
       }
-    }
-
-    const business = await connection('business')
-      .where({ id })
-      .update(
-        {businessTitle, description, phone, street, neighborhood, zipCode, coordinates}
-        )
-      .then(async () => {
-        const result = await connection('business')
+  
+      const [business] = await connection('business')
         .where({ id })
-        .update(
-          { updatedAt: connection.fn.now(6) },
-          ['businessTitle', 'description', 'phone', 'street', 'neighborhood', 'zipCode', 'coordinates', 'updatedAt']
-        )
-        return result
-      })
-      .catch((err) =>{ 
-        error = err
-      })
-    
-    if (!business[0]) res.json({ error: { code: 404, message: 'Business not found'}})
-    
-    return res.json( business || { error })
+        .update({businessTitle, description, phone, street, neighborhood, zipCode, coordinates})
+        .then(async () => {
+          const updateTimestamps = await connection('business')
+          .where({ id })
+          .update({ updatedAt: connection.fn.now(6) },
+            ['businessTitle', 'description', 'phone', 'street', 'neighborhood', 'zipCode', 'coordinates', 'updatedAt'])
+          return updateTimestamps
+        })
+      
+      if (!business) 
+        return res.status(404).json({ error: { value: id, param: 'busines.id', msg: 'Business not found'}})
+      
+      return res.json( business )
+    } catch (error) {
+      return res.status(400).json({ error })
+    }
   },
 
   async destroy(req, res){
     const { id } = req.params 
     const userId = req.userId
-    let error
 
-    // verify if user is owner of the business
-    const [owner] = await connection('business')
-      .select('id', 'userId')
-      .where({ id, userId})
-    
-    if(!owner)
-      return res.status(401).json({ error: { value: id, param: 'business.id',msg: 'user is not authorized for this action'}})
-
-    await connection('business')
-      .where({ id })
-      .del()
-      .catch((err) =>{ 
-        error = err
-      })
-
-    if( error ) res.json({ error })
-
-    return res.status(204).send()
+    try {
+      // verify if user is owner of the business
+      const [owner] = await connection('business')
+        .select('id', 'userId')
+        .where({ id, userId})
+      
+      if(!owner)
+        return res.status(401).json({ error: { value: id, param: 'business.id',msg: 'user is not authorized for this action'}})
+  
+      await connection('business')
+        .where({ id })
+        .del()
+      
+      return res.status(204).send()
+    } catch (error) {
+      return res.status(400).json({ error })
+    }
   },
 }
