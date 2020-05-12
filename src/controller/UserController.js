@@ -76,7 +76,7 @@ module.exports = {
           messageId: info.messageId,
           response: info.response,
         }
-        return res.json({ user })
+        return res.json( user )
       })
     } catch (error) {
       if(error.name === 'error' && error.constraint)
