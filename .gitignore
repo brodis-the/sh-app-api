@@ -7,3 +7,7 @@ knexfile.js
 .env
 
 src/resources/teste.html
+
+#Dockerfiles
+/src/database/Dockerfile
+/src/Dockerfile
