@@ -19,7 +19,6 @@
     "knex": "0.20.15",
     "nodemailer": "6.4.6",
     "pg": "8.0.2",
-    "sqlite3": "4.1.1",
     "uuid": "8.0.0"
   },
   "devDependencies": {
