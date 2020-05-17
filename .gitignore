@@ -1,5 +1,5 @@
 node_modules
-
+~/.nvm
 yarn.lock
 
 knexfile.js
@@ -7,3 +7,6 @@ knexfile.js
 .env
 
 src/resources/teste.html
+
+#Dockerfiles
+/src/database/Dockerfile
